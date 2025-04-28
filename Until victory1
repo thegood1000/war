@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="he">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>קאונטר זמן מלחמה</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: 'Poppins', Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background-color: transparent;
+    }
+    
+    .war-counter-container {
+      background-color: #003044;
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+      position: relative;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      width: 100%;
+      max-width: 600px;
+    }
+    
+    .close-button {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      color: #00ccf4;
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      outline: none;
+    }
+    
+    .top-image, .bottom-image {
+      width: 100%;
+      max-width: 500px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      margin: 10px auto;
+      display: none; /* Hidden by default, will be shown via JavaScript if URL provided */
+    }
+    
+    .counter-title, .counter-subtitle {
+      color: #00ccf4;
+      margin: 15px 0;
+      font-size: 22px;
+      font-weight: bold;
+    }
+    
+    .counter-title {
+      margin-top: 5px;
+    }
+    
+    .counter-subtitle {
+      margin-bottom: 5px;
+    }
+    
+    .counter-digits {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 15px 0;
+      direction: ltr; /* For correct display of numbers */
+    }
+    
+    .time-unit {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 0 5px;
+    }
+    
+    .digit-box {
+      background-color: #ffffff;
+      border-radius: 8px;
+      width: 70px;
+      height: 80px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      overflow: hidden;
+    }
+    
+    .digit {
+      font-size: 48px;
+      font-weight: bold;
+      color: #003044;
+      letter-spacing: 2px;
+      transition: transform 0.3s ease;
+    }
+    
+    .digit.changing {
+      transform: scale(1.1);
+    }
+    
+    .separator {
+      color: #00ccf4;
+      font-size: 36px;
+      font-weight: bold;
+      margin: 0 2px;
+      align-self: center;
+    }
+    
+    .unit-label {
+      color: #00ccf4;
+      font-size: 12px;
+      margin-top: 5px;
+      text-align: center;
+    }
+    
+    @media (max-width: 600px) {
+      .war-counter-container {
+        padding: 15px 10px;
+      }
+      
+      .digit-box {
+        width: 50px;
+        height: 60px;
+      }
+      
+      .digit {
+        font-size: 32px;
+      }
+      
+      .separator {
+        font-size: 28px;
+      }
+      
+      .counter-title, .counter-subtitle {
+        font-size: 18px;
+      }
+    }
+    
+    @media (max-width: 400px) {
+      .digit-box {
+        width: 40px;
+        height: 50px;
+      }
+      
+      .digit {
+        font-size: 24px;
+      }
+      
+      .separator {
+        font-size: 20px;
+      }
+      
+      .counter-title, .counter-subtitle {
+        font-size: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="war-counter-container" id="war-counter">
+    <button class="close-button" id="close-counter">✕</button>
+    <img class="top-image" id="top-image" src="" alt="">
+    <div class="counter-title">מתחילת המלחמה עבר</div>
+    <div class="counter-digits">
+      <div class="time-unit">
+        <div class="digit-box">
+          <span class="digit" id="days">000</span>
+        </div>
+        <span class="unit-label">ימים</span>
+      </div>
+      <span class="separator">:</span>
+      <div class="time-unit">
+        <div class="digit-box">
+          <span class="digit" id="hours">00</span>
+        </div>
+        <span class="unit-label">שעות</span>
+      </div>
+      <span class="separator">:</span>
+      <div class="time-unit">
+        <div class="digit-box">
+          <span class="digit" id="minutes">00</span>
+        </div>
+        <span class="unit-label">דקות</span>
+      </div>
+      <span class="separator">:</span>
+      <div class="time-unit">
+        <div class="digit-box">
+          <span class="digit" id="seconds">00</span>
+        </div>
+        <span class="unit-label">שניות</span>
+      </div>
+    </div>
+    <div class="counter-subtitle">ועדיין חמאס לא מוכרע</div>
+    <img class="bottom-image" id="bottom-image" src="" alt="">
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Parse URL parameters
+      const urlParams = new URLSearchParams(window.location.search);
+      
+      // Set top and bottom images if provided in URL parameters
+      const topImageUrl = urlParams.get('topImage');
+      const bottomImageUrl = urlParams.get('bottomImage');
+      
+      if (topImageUrl) {
+        const topImage = document.getElementById('top-image');
+        topImage.src = topImageUrl;
+        topImage.style.display = 'block';
+      }
+      
+      if (bottomImageUrl) {
+        const bottomImage = document.getElementById('bottom-image');
+        bottomImage.src = bottomImageUrl;
+        bottomImage.style.display = 'block';
+      }
+      
+      // Customize colors and text if provided in URL parameters
+      const bgColor = urlParams.get('bgColor') || '#003044';
+      const textColor = urlParams.get('textColor') || '#00ccf4';
+      const boxColor = urlParams.get('boxColor') || '#ffffff';
+      const digitColor = urlParams.get('digitColor') || '#003044';
+      
+      const topText = urlParams.get('topText') || 'מתחילת המלחמה עבר';
+      const bottomText = urlParams.get('bottomText') || 'ועדיין חמאס לא מוכרע';
+      
+      // Apply custom styles
+      document.querySelector('.war-counter-container').style.backgroundColor = bgColor;
+      
+      const textElements = document.querySelectorAll('.counter-title, .counter-subtitle, .separator, .unit-label, .close-button');
+      textElements.forEach(el => {
+        el.style.color = textColor;
+      });
+      
+      const boxElements = document.querySelectorAll('.digit-box');
+      boxElements.forEach(el => {
+        el.style.backgroundColor = boxColor;
+      });
+      
+      const digitElements = document.querySelectorAll('.digit');
+      digitElements.forEach(el => {
+        el.style.color = digitColor;
+      });
+      
+      // Set custom text
+      document.querySelector('.counter-title').textContent = topText;
+      document.querySelector('.counter-subtitle').textContent = bottomText;
+      
+      // War start date: October 7, 2023, 06:29 AM Israel time
+      const warStartDate = new Date('2023-10-07T06:29:00+03:00');
+      
+      // Update counter function
+      function updateCounter() {
+        const now = new Date();
+        const timeDiff = now - warStartDate;
+        
+        // Calculate time units
+        const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((timeDiff % (1000 * 60)) / 1000);
+        
+        // Update display with animation
+        updateDigit('days', days.toString().padStart(3, '0'));
+        updateDigit('hours', hours.toString().padStart(2, '0'));
+        updateDigit('minutes', minutes.toString().padStart(2, '0'));
+        updateDigit('seconds', seconds.toString().padStart(2, '0'));
+      }
+      
+      // Function to update a digit with animation
+      function updateDigit(id, newValue) {
+        const digitElement = document.getElementById(id);
+        if (digitElement.textContent !== newValue) {
+          digitElement.classList.add('changing');
+          setTimeout(() => {
+            digitElement.textContent = newValue;
+            setTimeout(() => {
+              digitElement.classList.remove('changing');
+            }, 150);
+          }, 150);
+        }
+      }
+      
+      // Close button functionality
+      document.getElementById('close-counter').addEventListener('click', function() {
+        document.getElementById('war-counter').style.display = 'none';
+        
+        // If inside an iframe, try to notify parent
+        try {
+          if (window.parent && window.parent !== window) {
+            window.parent.postMessage('closeWarCounter', '*');
+          }
+        } catch (e) {
+          console.error('Could not communicate with parent window', e);
+        }
+      });
+      
+      // Initial update
+      updateCounter();
+      
+      // Update every second
+      setInterval(updateCounter, 1000);
+    });
+  </script>
+</body>
+</html>
