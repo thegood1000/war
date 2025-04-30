@@ -1,316 +1,463 @@
 <!DOCTYPE html>
-<html dir="rtl" lang="he">
+<html lang="he" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>קאונטר זמן מלחמה</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700&display=swap" rel="stylesheet">
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>קאונטר זמן מלחמה</title>
     
-    body {
-      font-family: 'Poppins', Arial, sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-      background-color: transparent;
-    }
+    <!-- Google Font - Poppins -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
     
-    .war-counter-container {
-      background-color: #003044;
-      border-radius: 12px;
-      padding: 20px;
-      text-align: center;
-      position: relative;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-      width: 100%;
-      max-width: 600px;
-    }
-    
-    .close-button {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      color: #00ccf4;
-      background: none;
-      border: none;
-      font-size: 24px;
-      cursor: pointer;
-      outline: none;
-    }
-    
-    .top-image, .bottom-image {
-      width: 100%;
-      max-width: 500px;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-      margin: 10px auto;
-      display: none; /* Hidden by default, will be shown via JavaScript if URL provided */
-    }
-    
-    .counter-title, .counter-subtitle {
-      color: #00ccf4;
-      margin: 15px 0;
-      font-size: 22px;
-      font-weight: bold;
-    }
-    
-    .counter-title {
-      margin-top: 5px;
-    }
-    
-    .counter-subtitle {
-      margin-bottom: 5px;
-    }
-    
-    .counter-digits {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      margin: 15px 0;
-      direction: ltr; /* For correct display of numbers */
-    }
-    
-    .time-unit {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      margin: 0 5px;
-    }
-    
-    .digit-box {
-      background-color: #ffffff;
-      border-radius: 8px;
-      width: 70px;
-      height: 80px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-      overflow: hidden;
-    }
-    
-    .digit {
-      font-size: 48px;
-      font-weight: bold;
-      color: #003044;
-      letter-spacing: 2px;
-      transition: transform 0.3s ease;
-    }
-    
-    .digit.changing {
-      transform: scale(1.1);
-    }
-    
-    .separator {
-      color: #00ccf4;
-      font-size: 36px;
-      font-weight: bold;
-      margin: 0 2px;
-      align-self: center;
-    }
-    
-    .unit-label {
-      color: #00ccf4;
-      font-size: 12px;
-      margin-top: 5px;
-      text-align: center;
-    }
-    
-    @media (max-width: 600px) {
-      .war-counter-container {
-        padding: 15px 10px;
-      }
-      
-      .digit-box {
-        width: 50px;
-        height: 60px;
-      }
-      
-      .digit {
-        font-size: 32px;
-      }
-      
-      .separator {
-        font-size: 28px;
-      }
-      
-      .counter-title, .counter-subtitle {
-        font-size: 18px;
-      }
-    }
-    
-    @media (max-width: 400px) {
-      .digit-box {
-        width: 40px;
-        height: 50px;
-      }
-      
-      .digit {
-        font-size: 24px;
-      }
-      
-      .separator {
-        font-size: 20px;
-      }
-      
-      .counter-title, .counter-subtitle {
-        font-size: 16px;
-      }
-    }
-  </style>
+    <style>
+        :root {
+            --main-bg-color: #003044;
+            --text-color: #00ccf4;
+            --box-bg-color: #ffffff;
+            --text-size: 48px;
+            --text-letter-spacing: 2px;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            direction: rtl;
+        }
+        
+        #war-counter-container {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background-color: var(--main-bg-color);
+            color: var(--text-color);
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            max-width: 100%;
+            width: auto;
+        }
+        
+        #war-counter-close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: var(--text-color);
+            background: transparent;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s ease;
+        }
+        
+        #war-counter-close:hover {
+            transform: scale(1.2);
+        }
+        
+        #war-counter-header {
+            font-size: 18px;
+            margin-bottom: 10px;
+            text-align: center;
+            font-weight: bold;
+            width: 100%;
+        }
+        
+        #war-counter-image {
+            max-width: 80px;
+            max-height: 80px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            margin-bottom: 15px;
+            display: none; /* Hidden by default, shown when image URL is provided */
+        }
+        
+        #war-counter-digits {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            margin: 10px 0;
+            gap: 8px;
+        }
+        
+        .digit-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .digit-box {
+            background-color: var(--box-bg-color);
+            border-radius: 8px;
+            padding: 5px 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            min-width: 100px;
+            height: 80px;
+        }
+        
+        .digit {
+            font-size: var(--text-size);
+            font-weight: bold;
+            letter-spacing: var(--text-letter-spacing);
+            color: var(--main-bg-color);
+            text-shadow: 0 2px 2px rgba(0, 0, 0, 0.15);
+            transition: transform 0.3s ease;
+        }
+        
+        .digit.changed {
+            animation: flip 0.5s ease;
+        }
+        
+        .separator {
+            font-size: 36px;
+            font-weight: bold;
+            margin: 0 5px;
+            align-self: center;
+        }
+        
+        .unit-label {
+            font-size: 14px;
+            margin-top: 5px;
+            text-align: center;
+        }
+        
+        #war-counter-footer {
+            font-size: 18px;
+            margin-top: 10px;
+            text-align: center;
+            font-weight: bold;
+            width: 100%;
+        }
+        
+        @keyframes flip {
+            0% {
+                transform: rotateX(0);
+            }
+            50% {
+                transform: rotateX(90deg);
+            }
+            100% {
+                transform: rotateX(0);
+            }
+        }
+        
+        /* Responsive styles */
+        @media screen and (max-width: 768px) {
+            :root {
+                --text-size: 36px;
+            }
+            
+            .digit-box {
+                min-width: 70px;
+                height: 60px;
+            }
+            
+            #war-counter-header,
+            #war-counter-footer {
+                font-size: 16px;
+            }
+        }
+        
+        @media screen and (max-width: 480px) {
+            :root {
+                --text-size: 28px;
+                --text-letter-spacing: 1px;
+            }
+            
+            .digit-box {
+                min-width: 50px;
+                height: 50px;
+                padding: 5px;
+            }
+            
+            .separator {
+                font-size: 24px;
+                margin: 0 2px;
+            }
+            
+            #war-counter-container {
+                bottom: 10px;
+                left: 10px;
+                padding: 10px;
+            }
+            
+            #war-counter-header,
+            #war-counter-footer {
+                font-size: 14px;
+            }
+            
+            .unit-label {
+                font-size: 10px;
+            }
+        }
+    </style>
 </head>
 <body>
-  <div class="war-counter-container" id="war-counter">
-    <button class="close-button" id="close-counter">✕</button>
-    <img class="top-image" id="top-image" src="" alt="">
-    <div class="counter-title">מתחילת המלחמה עבר</div>
-    <div class="counter-digits">
-      <div class="time-unit">
-        <div class="digit-box">
-          <span class="digit" id="days">000</span>
+    <div id="war-counter-container">
+        <button id="war-counter-close">✕</button>
+        <img id="war-counter-image" alt="War Counter Icon">
+        <div id="war-counter-header">מתחילת המלחמה עבר</div>
+        <div id="war-counter-digits">
+            <div class="digit-container">
+                <div class="digit-box">
+                    <span id="days" class="digit">0</span>
+                </div>
+                <div class="unit-label">ימים</div>
+            </div>
+            <span class="separator">:</span>
+            <div class="digit-container">
+                <div class="digit-box">
+                    <span id="hours" class="digit">00</span>
+                </div>
+                <div class="unit-label">שעות</div>
+            </div>
+            <span class="separator">:</span>
+            <div class="digit-container">
+                <div class="digit-box">
+                    <span id="minutes" class="digit">00</span>
+                </div>
+                <div class="unit-label">דקות</div>
+            </div>
+            <span class="separator">:</span>
+            <div class="digit-container">
+                <div class="digit-box">
+                    <span id="seconds" class="digit">00</span>
+                </div>
+                <div class="unit-label">שניות</div>
+            </div>
         </div>
-        <span class="unit-label">ימים</span>
-      </div>
-      <span class="separator">:</span>
-      <div class="time-unit">
-        <div class="digit-box">
-          <span class="digit" id="hours">00</span>
-        </div>
-        <span class="unit-label">שעות</span>
-      </div>
-      <span class="separator">:</span>
-      <div class="time-unit">
-        <div class="digit-box">
-          <span class="digit" id="minutes">00</span>
-        </div>
-        <span class="unit-label">דקות</span>
-      </div>
-      <span class="separator">:</span>
-      <div class="time-unit">
-        <div class="digit-box">
-          <span class="digit" id="seconds">00</span>
-        </div>
-        <span class="unit-label">שניות</span>
-      </div>
+        <div id="war-counter-footer">ועדיין חמאס לא מוכרע</div>
     </div>
-    <div class="counter-subtitle">ועדיין חמאס לא מוכרע</div>
-    <img class="bottom-image" id="bottom-image" src="" alt="">
-  </div>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      // Parse URL parameters
-      const urlParams = new URLSearchParams(window.location.search);
-      
-      // Set top and bottom images if provided in URL parameters
-      const topImageUrl = urlParams.get('topImage');
-      const bottomImageUrl = urlParams.get('bottomImage');
-      
-      if (topImageUrl) {
-        const topImage = document.getElementById('top-image');
-        topImage.src = topImageUrl;
-        topImage.style.display = 'block';
-      }
-      
-      if (bottomImageUrl) {
-        const bottomImage = document.getElementById('bottom-image');
-        bottomImage.src = bottomImageUrl;
-        bottomImage.style.display = 'block';
-      }
-      
-      // Customize colors and text if provided in URL parameters
-      const bgColor = urlParams.get('bgColor') || '#003044';
-      const textColor = urlParams.get('textColor') || '#00ccf4';
-      const boxColor = urlParams.get('boxColor') || '#ffffff';
-      const digitColor = urlParams.get('digitColor') || '#003044';
-      
-      const topText = urlParams.get('topText') || 'מתחילת המלחמה עבר';
-      const bottomText = urlParams.get('bottomText') || 'ועדיין חמאס לא מוכרע';
-      
-      // Apply custom styles
-      document.querySelector('.war-counter-container').style.backgroundColor = bgColor;
-      
-      const textElements = document.querySelectorAll('.counter-title, .counter-subtitle, .separator, .unit-label, .close-button');
-      textElements.forEach(el => {
-        el.style.color = textColor;
-      });
-      
-      const boxElements = document.querySelectorAll('.digit-box');
-      boxElements.forEach(el => {
-        el.style.backgroundColor = boxColor;
-      });
-      
-      const digitElements = document.querySelectorAll('.digit');
-      digitElements.forEach(el => {
-        el.style.color = digitColor;
-      });
-      
-      // Set custom text
-      document.querySelector('.counter-title').textContent = topText;
-      document.querySelector('.counter-subtitle').textContent = bottomText;
-      
-      // War start date: October 7, 2023, 06:29 AM Israel time
-      const warStartDate = new Date('2023-10-07T06:29:00+03:00');
-      
-      // Update counter function
-      function updateCounter() {
-        const now = new Date();
-        const timeDiff = now - warStartDate;
+    <script>
+        // Constants
+        const WAR_START_DATE = new Date('2023-10-07T06:29:00+03:00'); // Israel Standard Time
         
-        // Calculate time units
-        const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((timeDiff % (1000 * 60)) / 1000);
+        // Elements
+        const daysEl = document.getElementById('days');
+        const hoursEl = document.getElementById('hours');
+        const minutesEl = document.getElementById('minutes');
+        const secondsEl = document.getElementById('seconds');
+        const counterContainer = document.getElementById('war-counter-container');
+        const closeButton = document.getElementById('war-counter-close');
+        const headerText = document.getElementById('war-counter-header');
+        const footerText = document.getElementById('war-counter-footer');
+        const counterImage = document.getElementById('war-counter-image');
         
-        // Update display with animation
-        updateDigit('days', days.toString().padStart(3, '0'));
-        updateDigit('hours', hours.toString().padStart(2, '0'));
-        updateDigit('minutes', minutes.toString().padStart(2, '0'));
-        updateDigit('seconds', seconds.toString().padStart(2, '0'));
-      }
-      
-      // Function to update a digit with animation
-      function updateDigit(id, newValue) {
-        const digitElement = document.getElementById(id);
-        if (digitElement.textContent !== newValue) {
-          digitElement.classList.add('changing');
-          setTimeout(() => {
-            digitElement.textContent = newValue;
-            setTimeout(() => {
-              digitElement.classList.remove('changing');
-            }, 150);
-          }, 150);
+        // Parse URL parameters
+        function getUrlParams() {
+            const params = new URLSearchParams(window.location.search);
+            return {
+                topText: params.get('topText'),
+                bottomText: params.get('bottomText'),
+                bgColor: params.get('bgColor'),
+                textColor: params.get('textColor'),
+                boxColor: params.get('boxColor'),
+                imageUrl: params.get('imageUrl'),
+                hidden: params.get('hidden') === 'true'
+            };
         }
-      }
-      
-      // Close button functionality
-      document.getElementById('close-counter').addEventListener('click', function() {
-        document.getElementById('war-counter').style.display = 'none';
         
-        // If inside an iframe, try to notify parent
-        try {
-          if (window.parent && window.parent !== window) {
-            window.parent.postMessage('closeWarCounter', '*');
-          }
-        } catch (e) {
-          console.error('Could not communicate with parent window', e);
+        // Apply custom settings from URL parameters
+        function applyCustomSettings() {
+            const params = getUrlParams();
+            
+            if (params.topText) headerText.textContent = params.topText;
+            if (params.bottomText) footerText.textContent = params.bottomText;
+            
+            if (params.bgColor) {
+                document.documentElement.style.setProperty('--main-bg-color', params.bgColor);
+            }
+            
+            if (params.textColor) {
+                document.documentElement.style.setProperty('--text-color', params.textColor);
+            }
+            
+            if (params.boxColor) {
+                document.documentElement.style.setProperty('--box-bg-color', params.boxColor);
+            }
+            
+            if (params.imageUrl) {
+                counterImage.src = params.imageUrl;
+                counterImage.style.display = 'block';
+            }
+            
+            if (params.hidden) {
+                counterContainer.style.display = 'none';
+            }
         }
-      });
-      
-      // Initial update
-      updateCounter();
-      
-      // Update every second
-      setInterval(updateCounter, 1000);
-    });
-  </script>
+        
+        // Calculate and update time passed since war start
+        function updateCounter() {
+            const currentTime = new Date();
+            const timeDifference = currentTime - WAR_START_DATE;
+            
+            // Calculate days, hours, minutes, seconds
+            const days = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((timeDifference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((timeDifference % (1000 * 60)) / 1000);
+            
+            // Update DOM with new values with animation for changed values
+            updateDigit(daysEl, days);
+            updateDigit(hoursEl, hours, true);
+            updateDigit(minutesEl, minutes, true);
+            updateDigit(secondsEl, seconds, true);
+        }
+        
+        // Update a digit with animation if it changed
+        function updateDigit(element, value, padZero = false) {
+            const newValue = padZero ? String(value).padStart(2, '0') : String(value);
+            
+            if (element.textContent !== newValue) {
+                element.classList.add('changed');
+                
+                setTimeout(() => {
+                    element.textContent = newValue;
+                }, 250);
+                
+                setTimeout(() => {
+                    element.classList.remove('changed');
+                }, 500);
+            }
+        }
+        
+        // Close counter
+        closeButton.addEventListener('click', function() {
+            counterContainer.style.display = 'none';
+            
+            // Try to store closed state in local storage
+            try {
+                localStorage.setItem('warCounterClosed', 'true');
+            } catch (e) {
+                // In case we're in a sandboxed iframe without access to localStorage
+                console.log('Cannot access localStorage. Counter state will not persist.');
+                
+                // Alternative: Pass message to parent if in iframe
+                try {
+                    if(window.parent !== window) {
+                        window.parent.postMessage({
+                            type: 'warCounter',
+                            action: 'closed'
+                        }, '*');
+                    }
+                } catch (e) {
+                    console.log('Cannot communicate with parent window');
+                }
+            }
+        });
+        
+        // Check if counter was previously closed
+        function checkIfPreviouslyClosed() {
+            try {
+                if (localStorage.getItem('warCounterClosed') === 'true') {
+                    counterContainer.style.display = 'none';
+                }
+            } catch (e) {
+                // Cannot access localStorage, possibly in a sandboxed iframe
+                console.log('Cannot access localStorage. Counter will show by default.');
+            }
+        }
+        
+        // API for external communication
+        window.warCounterAPI = {
+            getTimeElapsed: function() {
+                const currentTime = new Date();
+                const timeDifference = currentTime - WAR_START_DATE;
+                
+                return {
+                    days: Math.floor(timeDifference / (1000 * 60 * 60 * 24)),
+                    hours: Math.floor((timeDifference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
+                    minutes: Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60)),
+                    seconds: Math.floor((timeDifference % (1000 * 60)) / 1000),
+                    totalSeconds: Math.floor(timeDifference / 1000)
+                };
+            },
+            show: function() {
+                counterContainer.style.display = 'flex';
+                localStorage.removeItem('warCounterClosed');
+            },
+            hide: function() {
+                counterContainer.style.display = 'none';
+            },
+            updateSettings: function(settings) {
+                if (settings.topText) headerText.textContent = settings.topText;
+                if (settings.bottomText) footerText.textContent = settings.bottomText;
+                if (settings.bgColor) {
+                    document.documentElement.style.setProperty('--main-bg-color', settings.bgColor);
+                }
+                if (settings.textColor) {
+                    document.documentElement.style.setProperty('--text-color', settings.textColor);
+                }
+                if (settings.boxColor) {
+                    document.documentElement.style.setProperty('--box-bg-color', settings.boxColor);
+                }
+                if (settings.imageUrl) {
+                    counterImage.src = settings.imageUrl;
+                    counterImage.style.display = 'block';
+                }
+            }
+        };
+        
+        // CORS support for API calls
+        function handleCORS() {
+            // Simple JSONP-like approach
+            if (window.location.search.includes('callback=')) {
+                const callbackName = new URLSearchParams(window.location.search).get('callback');
+                if (callbackName && typeof window[callbackName] === 'function') {
+                    window[callbackName](window.warCounterAPI.getTimeElapsed());
+                }
+            }
+        }
+        
+        // Listen for messages from parent frame
+        window.addEventListener('message', function(event) {
+            // Process messages from parent
+            try {
+                if (event.data && event.data.type === 'warCounter') {
+                    const action = event.data.action;
+                    
+                    if (action === 'refresh') {
+                        updateCounter();
+                    } else if (action === 'hide') {
+                        counterContainer.style.display = 'none';
+                    } else if (action === 'show') {
+                        counterContainer.style.display = 'flex';
+                    } else if (action === 'updateSettings' && event.data.settings) {
+                        window.warCounterAPI.updateSettings(event.data.settings);
+                    }
+                }
+            } catch (e) {
+                console.log('Error processing message from parent:', e);
+            }
+        });
+        
+        // Initialize
+        function init() {
+            applyCustomSettings();
+            checkIfPreviouslyClosed();
+            updateCounter();
+            setInterval(updateCounter, 1000);
+            handleCORS();
+        }
+        
+        // Start counter when DOM is loaded
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
 </body>
 </html>
